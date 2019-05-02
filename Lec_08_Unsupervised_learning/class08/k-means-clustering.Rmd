@@ -1,0 +1,303 @@
+---
+title: 'Class 8: Machine Learning'
+author: "Ezequiel Quevedo"
+date: "4/25/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## k-means clustering
+
+Let's start with an example of running the **kmeans()** function
+
+```{r}
+# Generate some example data for clustering
+tmp <- c(rnorm(30,-3), rnorm(30,3)) # 30 points centered around -3 & 3
+x <- cbind(x=tmp, y=rev(tmp))
+
+plot(x)
+```
+
+Task:
+Use the kmeans() function setting k to 2 and nstart=20
+
+Inspect/print the results
+
+> Q. How many points are in each cluster?
+30
+km$size
+
+> Q. What ‘component’ of your result object details
+- cluster size?
+- cluster assignment/membership?
+- cluster center?
+
+> Plot x colored by the kmeans cluster assignment and
+> add cluster centers as blue points
+
+```{r}
+ss <- kmeans(x, centers = 2, nstart = 20)
+ss
+```
+
+```{r}
+# cluster size
+ss$size
+
+# cluster assignment
+ss$cluster
+
+# cluster center
+ss$centers
+
+plot(x, col=ss$cluster)
+points(ss$centers, pch=18, col="blue", cex=3)
+```
+
+
+## Heirarchical Clustering
+### something you can code as a measure of similarity
+
+We must five the **hclust()** function a distance matrix **not the raw data** as input
+
+```{r}
+# distance matrix calculation
+d <- dist(x)
+
+#clustering
+hc <- hclust(d)
+plot(hc)
+
+# plot line
+abline(h=6, col="red")
+
+# cut tree
+cutree(hc, h=6)
+cutree(hc, k=2)
+cutree(hc, k=3)
+
+
+```
+
+> # What do you notice?
+There are two major clusters that are separated into smaller lineages of clusters
+# Does the dendrogram make sense based on your knowledge of x?
+Each cluster has 30 points
+The grouping pattern (height, bc we're using distance data).
+The greatest height is between the centers of both clusters (~7)
+
+
+># Step 1. Generate some example data for clustering
+x <- rbind(
+matrix(rnorm(100, mean=0, sd = 0.3), ncol = 2), # c1
+matrix(rnorm(100, mean = 1, sd = 0.3), ncol = 2), # c2
+matrix(c(rnorm(50, mean = 1, sd = 0.3), # c3
+rnorm(50, mean = 0, sd = 0.3)), ncol = 2))
+colnames(x) <- c("x", "y")
+# Step 2. Plot the data without clustering
+plot(x)
+# Step 3. Generate colors for known clusters
+# (just so we can compare to hclust results)
+col <- as.factor( rep(c("c1","c2","c3"), each=50) )
+plot(x, col=col)
+Your Turn!
+Q. Use the dist(), hclust(), plot() and cutree()
+functions to return 2 and 3 clusters
+Q. How does this compare to your known 'col' groups?
+
+```{r}
+# Step 1. Generate some example data for clustering
+x <- rbind(
+  matrix(rnorm(100, mean=0, sd = 0.3), ncol = 2), # c1
+  matrix(rnorm(100, mean = 1, sd = 0.3), ncol = 2), # c2
+  matrix(c(rnorm(50, mean = 1, sd = 0.3), # c3
+  rnorm(50, mean = 0, sd = 0.3)), ncol = 2))
+colnames(x) <- c("x", "y")
+# Step 2. Plot the data without clustering
+plot(x, col=col)
+# Step 3. Generate colors for known clusters
+# (just so we can compare to hclust results)
+col <- as.factor( rep(c("c1","c2","c3"), each=50) )
+```
+
+> Q. Use the dist(), hclust(), plot() and cutree()
+functions to return 2 and 3 clusters
+Q. How does this compare to your known 'col' groups?
+
+```{r}
+hc <- hclust(dist(x))
+plot(hc)
+
+abline(h=2, col="blue")
+abline(h=2.6, col="red")
+
+gp2 <- cutree(hc, k=2)
+gp3 <- cutree(hc, k=3)
+
+gp2
+gp3
+
+plot(x, col=gp2)
+plot(x, col=gp3) # looks for non-overlapping groups of data
+```
+
+```{r}
+table(gp2)
+```
+
+```{r}
+table(gp3)
+```
+
+```{r}
+table(gp2, gp3) # cross-tabulating
+```
+
+# PCA: Principal Component Analysis of RefSeq data
+we will use the **prcomp()** function for PCA
+```{r}
+# Example Data
+## You can also download this file from the class website!
+mydata <- read.csv("https://tinyurl.com/expression-CSV",
+  row.names=1)
+head(mydata)
+```
+```{r}
+# how many genes are in this data?
+nrow(mydata)
+```
+
+```{r}
+# how many variants are in this data?
+ncol(mydata)
+```
+```{r}
+# what are the names of our variants?
+colnames(mydata)
+```
+ 
+#prcomp() expects the transpose of our data (our rows are now columns, and vice versa)
+```{r}
+head(t(mydata))
+```
+
+Run our PCA analysis on the transpose of our data.
+```{r}
+pca <- prcomp(t(mydata), scale=TRUE)
+```
+
+```{r}
+# a basic PC1 vs PC2 plot
+plot(pca$x[,1], pca$x[,2], xlab="PC1", ylab="PC2")
+```
+
+A little extra work to find the variance using **prcomp()**
+```{r}
+## percent variance is often more informative to look at
+pca.var <- pca$sdev^2 # square of the deviation
+pca.var.per <- round(pca.var/sum(pca.var)*100, 1)
+
+head(pca.var.per)
+```
+
+```{r}
+barplot(pca.var.per, main="Scree Plot",
+xlab="Principal Component", ylab="Percent Variation")
+```
+
+A more useful plot:
+```{r}
+## A vector of colors for wt and ko samples
+colvec <- colnames(mydata)
+colvec[grep("wt", colvec)] <- "red"
+colvec[grep("ko", colvec)] <- "blue"
+plot(pca$x[,1], pca$x[,2], col=colvec, pch=16,
+xlab=paste0("PC1 (", pca.var.per[1], "%)"),
+ylab=paste0("PC2 (", pca.var.per[2], "%)"))
+
+## Click to identify which sample is which
+identify(pca$x[,1], pca$x[,2], labels=colnames(mydata))
+## Press ESC to exit…
+```
+
+# PRACTICE
+
+```{r}
+# read-in data
+z <- read.csv("https://bioboot.github.io/bggn213_f17/class-material/UK_foods.csv")
+y <- read.csv("https://bioboot.github.io/bggn213_f17/class-material/UK_foods.csv", 
+              row.names = 1)
+```
+
+> Q1. How many rows and columns are in your new data frame named x? What R functions could you use to answer this questions?
+
+```{r}
+dim(z)
+dim(y)
+```
+
+> Check data
+
+```{r}
+View(z) # show all
+View(y)
+```
+
+
+```{r}
+#just the tip
+head(z)
+head(y)
+```
+
+> Identify major patterns and trends
+
+```{r}
+barplot(as.matrix(y), beside=T, col=rainbow(nrow(y)))
+```
+
+> Make a stacked plot
+
+```{r}
+barplot(as.matrix(y), beside=F, col=rainbow(nrow(y)))
+```
+
+> Q5: Generating all pairwise plots may help somewhat. Can you make sense of the following code and resulting figure? What does it mean if a given point lies on the diagonal for a given plot?
+
+```{r}
+pairs(z, col=rainbow(10), pch=16)
+pairs(y, col=rainbow(10), pch=16)
+```
+
+> Q6. What is the main differences between N. Ireland and the other countries of the UK in terms of this data-set?
+
+### PCA to the rescue: **prcomp( t() )**
+```{r}
+# Use the prcomp() PCA function 
+pca <- prcomp( t(y) )
+summary(pca)
+```
+Note that PC1 captures 67.44% of the variation.
+PC1 and PC2 capture 96.50% of the variation.
+**literature: "the first two principal components capture 96.50% of the variation."**
+
+
+> Q7. Complete the code below to generate a plot of PC1 vs PC2. The second line adds text labels over the data points.
+
+```{r}
+# Plot PC1 vs PC2
+plot(pca$x[,1], pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500), 
+     col=c("red", "blue", "orange", "green"), pch=18, cex=4)
+text(pca$x[,1], pca$x[,2], colnames(y))
+```
+
+## What did you find out from our PCA, and how?
+```{r}
+## Lets focus on PC1 as it accounts for > 90% of variance 
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,1], las=2 )
+```
+
