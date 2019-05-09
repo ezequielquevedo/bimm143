@@ -1,0 +1,139 @@
+---
+title: "Class 11: Structural Bioinformatics"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The PDB database
+
+The [PDB](https://www.rcsb.org) is the main repository for biomolecular structure data. 
+
+Here we examine the conents of the PDB:
+
+> Q1: Download a CSV file from the PDB site (accessible from “Analyze” -> “PDB Statistics” >
+“by Experimental Method and Molecular Type”. Move this CSV file into your RStudio project
+and determine the percentage of structures solved by X-Ray and Electron Microscopy. From
+the website what proportion of structures are protein? Aim to have a rendered GitHub document
+with working code that yields your answers.
+
+```{r}
+PDB_data_exp <- read.csv("PDB Data Export Summary.csv", row.names=1)
+View(PDB_data_exp)
+```
+
+How many are X-Ray?
+
+```{r}
+(PDB_data_exp$Total/sum(PDB_data_exp$Total))*100
+```
+
+What percent are Protein?
+
+```{r}
+sum(PDB_data_exp$Proteins)/sum(PDB_data_exp$Total) * 100
+```
+
+
+We could also try the datapasta package and copy from website and Addins > DATAPASTA > paste data.frame:
+```{r}
+library(datapasta)
+
+tmp <- data.frame(stringsAsFactors=FALSE,
+   Experimental.Method = c("X-Ray", "NMR", "Electron Microscopy", "Other",
+                           "Multi Method", "Total"),
+              Proteins = c(126880, 11062, 2277, 256, 129, 140604),
+         Nucleic.Acids = c(2012, 1279, 31, 4, 5, 3331),
+    Protein.NA.Complex = c(6547, 259, 800, 6, 2, 7614),
+                 Other = c(8, 8, 0, 13, 1, 30),
+                 Total = c(135447, 12608, 3108, 279, 137, 151579)
+)
+
+View(tmp)
+```
+
+
+> Q2: Type HIV in the PDB website search box on the home page and determine how many
+HIV-1 protease structures are in the current PDB?
+
+There are 1157 as of 2019-05-07: http://www.rcsb.org/pdb/results/results.do?tabtoshow=Current&qrid=9DD6CD99
+
+## 3.1 Getting Started with Bio3D
+```{r}
+library(bio3d)
+
+pdb <- read.pdb("1hsg")
+
+pdb
+```
+
+> Q6. How many amino acid residues are there in this pdb object and what are the two nonprotein
+residues?
+
+There are 198 amino acid residues in 1HSG. The two nonprotein residues are water and MAP kinase 1, the ligand. 
+
+```{r}
+attributes(pdb)
+
+head(pdb$atom)
+
+```
+
+> Q7. What type of R object is pdb$atom? HINT: You can always use the str() function to get a
+useful summery of any R object.
+
+pdb$atom is a data frame with numerical, character, and integer variables. 
+
+```{r}
+str(pdb$atom)
+```
+
+```{r}
+# Select all C-alpha atoms (return their indices)
+ca.inds <- atom.select(pdb, "calpha")
+ca.inds
+```
+
+Atom selection is done via the function **atom.select()**
+```{r}
+inds <- atom.select(pdb, "ligand")
+```
+```{r}
+pdb$atom[inds$atom, ]
+```
+
+```{r}
+prot.pdb <- atom.select(pdb, "protein", value = TRUE)
+write.pdb(prot.pdb, file = "1hsg_protein.pdb")
+```
+
+```{r}
+lig.pdb <- atom.select(pdb, "ligand", value = TRUE)
+write.pdb(lig.pdb, file = "1hsg_ligand.pdb")
+```
+
+## 3.1 Getting Started with Bio3D
+
+```{r}
+library(bio3d)
+```
+
+Use help(bio3d) for help.
+Use lbio3d() to list bio3d functions, and use help("<function name>") for more information about a particular function.
+
+## 3.2 Bio3D Functions and Common Uses
+
+Use example(<function>) to show examples of a Bio3D function usage:
+```{r}
+library(bio3d)
+example(vmd)
+```
+
+```{r}
+example(plot.bio3d)
+```
+
+## 3.3 Working with individual PDB files
+
