@@ -114,6 +114,15 @@ lig.pdb <- atom.select(pdb, "ligand", value = TRUE)
 write.pdb(lig.pdb, file = "1hsg_ligand.pdb")
 ```
 
+<<<<<<< HEAD
+=======
+## 3.1 Getting Started with Bio3D
+
+```{r}
+library(bio3d)
+```
+
+>>>>>>> 84b5eaed43e7f089aee16db2aa7f093b07040288
 Use help(bio3d) for help.
 Use lbio3d() to list bio3d functions, and use help("<function name>") for more information about a particular function.
 
@@ -129,6 +138,7 @@ example(vmd)
 example(plot.bio3d)
 ```
 
+<<<<<<< HEAD
 
 ## 4.2 Aligning multiple structures
 How to read multiple PDB structures from the RCSB PDB for a particular protein and perform some basic analysis:
@@ -162,4 +172,7 @@ pdbs_nofit <- pdbaln(files)
 # Print to screen a summary of the 'pdbs' object
 pdbs_nofit
 ```
+=======
+## 3.3 Working with individual PDB files
+>>>>>>> 84b5eaed43e7f089aee16db2aa7f093b07040288
 
