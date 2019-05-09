@@ -114,12 +114,6 @@ lig.pdb <- atom.select(pdb, "ligand", value = TRUE)
 write.pdb(lig.pdb, file = "1hsg_ligand.pdb")
 ```
 
-## 3.1 Getting Started with Bio3D
-
-```{r}
-library(bio3d)
-```
-
 Use help(bio3d) for help.
 Use lbio3d() to list bio3d functions, and use help("<function name>") for more information about a particular function.
 
@@ -135,5 +129,37 @@ example(vmd)
 example(plot.bio3d)
 ```
 
-## 3.3 Working with individual PDB files
+
+## 4.2 Aligning multiple structures
+How to read multiple PDB structures from the RCSB PDB for a particular protein and perform some basic analysis:
+
+```{r}
+# Download some example PDB files
+ids <- c("1TND_B","1AGR_A","1TAG_A","1GG2_A","1KJY_A","4G5Q_A")
+# IDs can also come form a blast.pdb() search
+files <- get.pdb(ids, split = TRUE) # download listed files
+# split = TRUE causes specifies that we want specific chains (e.g., _A, _B)
+```
+
+Align PDB amino acid sequences with **pdbaln()** and fit = TRUE argument:
+```{r}
+# Extract and align the chains we are interested in
+pdbs <- pdbaln(files, fit = TRUE)
+
+# Print to screen a summary of the 'pdbs' object
+pdbs
+```
+
+>Q8: What effect does setting the fit=TRUE option have in the related rmsd() function?
+What does RMSD measure and what would the results indicate if you set fit=FALSE or removed this option? HINT: Bio3D functions have various default options that will be used if the
+option is not explicitly specified by the user, see help(rmsd) for an example and note that the input options with an equals sign (e.g. fit=FALSE) have default values.
+
+A: The fit argument performs a coordinate superposition prior to calculating the root mean square deviation, or the standardized distance between coordinate sets. If fit = FALSE, which is the default argument if unspecified, the RMSD will be calculated without first aligning the sets of coordinates.
+```{r}
+# Extract and align the chains we are interested in
+pdbs_nofit <- pdbaln(files)
+
+# Print to screen a summary of the 'pdbs' object
+pdbs_nofit
+```
 
