@@ -1,0 +1,54 @@
+---
+title: "Class 13: Genome Informatics I"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Q5
+> What proportion of the Mexican Ancestry in Los Angeles sample population (MXL)
+are homozygous for the asthma associated SNP (G|G)?
+[HINT: You can download a CVS file for this population from ENSEMBLE and use the R
+functions read.csv(), and table() to answer this question]
+
+```{r}
+mxl <- read.csv("373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+table(mxl)
+head(mxl)
+View(mxl)
+table(mxl$Genotype..forward.strand.)
+```
+
+How many of each genotype are there?
+```{r}
+table(mxl$Genotype..forward.strand.)
+```
+
+Proportion (percent) of each genotype:
+```{r}
+table(mxl$Genotype..forward.strand.)/nrow(mxl)*100
+```
+
+# Q6
+>Back on the ENSEMBLE page, search for the particular sample HG00109. This is a
+male from the GBR population group. What is the genotype for this sample?
+
+```{r}
+
+```
+
+## Quality Scores in FASTQ Files
+
+The fourth line of a FASTQ file encodes the quality score that tells us how good the sequence at a given position is (i.e., how likely it is to be correct based on the instrument)
+
+```{r}
+library(seqinr)
+library(gtools)
+
+# print the number that the quality score assigns
+phred <- asc( s2c("DDDDCDEDCDDDDBBDDDCC@") ) - 33
+phred
+```
+
