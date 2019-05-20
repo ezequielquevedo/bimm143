@@ -26,7 +26,7 @@ modes <- nma(pdb)
 plot(modes, sse = pdb)
 
 # Visualize NMA results
-mktrj(modes, mode = 7, file = "1fq9_nma_7.pdb")
+mktrj(modes, mode = 7, file = "1fq9_nma_7.pdb", pdb=pdb)
 ```
 
 ## Normal Mode analysis for flexibility prediction of FGF2-FGFR1 complex
@@ -53,7 +53,7 @@ modes <- nma(pdb)
 plot(modes, sse = pdb)
 
 # Visualize NMA results
-mktrj(modes, mode = 7, file = "1cvs_nma_7.pdb")
+mktrj(modes, mode = 7, file = "1cvs_nma_7.pdb", pdb = pdb)
 ```
 
 
@@ -83,5 +83,5 @@ modes <- nma(pdb)
 plot(modes, sse = pdb)
 
 # Visualize NMA results
-mktrj(modes, mode = 7, file = "4OEE_nma_7.pdb")
+mktrj(modes, mode = 7, file = "4OEE_nma_7.pdb", pdb = pdb)
 ```
