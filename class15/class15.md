@@ -1414,3 +1414,29 @@ lapply(gobpres, head)
     ## GO:0007610 behavior                        3.530241 3.530241
     ## GO:0060562 epithelial tube morphogenesis   3.261376 3.261376
     ## GO:0035295 tube development                3.253665 3.253665
+
+## Section 4. Reactome Analysis
+
+Reactome is database consisting of biological molecules and their
+relation to pathways and processes. Reactome, such as many other tools,
+has an online software available (<https://reactome.org/>) and R package
+available
+(<https://bioconductor.org/packages/release/bioc/html/ReactomePA.html>).
+
+If you would like more information, the documentation is available here:
+<https://reactome.org/user/guide>
+
+Let’s now conduct over-representation enrichment analysis and
+pathway-topology analysis with Reactome using the previous list of
+significant genes generated from our differential expression results
+above.
+
+First, Using R, output the list of significant genes at the 0.05 level
+as a plain text file:
+
+``` r
+sig_genes <- res[res$padj <= 0.05 & !is.na(res$padj), "symbol"]
+print(paste("Total number of significant genes:", length(sig_genes)))
+```
+
+    ## [1] "Total number of significant genes: 8147"
