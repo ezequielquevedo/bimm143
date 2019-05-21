@@ -92,7 +92,7 @@ library(DESeq2)
     ##   c.quosures     rlang
     ##   print.quosures rlang
 
-## Import countData and colData
+## 1\. Import countData and colData
 
 Read-in count data and metadata
 files:
@@ -135,3 +135,83 @@ head(metadata)
     ## 4 SRR1039513 treated  N052611 GSM1275867
     ## 5 SRR1039516 control  N080611 GSM1275870
     ## 6 SRR1039517 treated  N080611 GSM1275871
+
+## 2\. Toy differential gene expression
+
+> Lets perform some exploratory differential gene expression analysis.
+> Note: this analysis is for demonstration only. NEVER do differential
+> expression analysis this way\!
+
+> Look at the metadata object again to see which samples are control and
+> which are drug treated
+
+``` r
+View(metadata)
+```
+
+> This bit of code will first find the sample id for those labeled
+> control. Then calculate the mean counts per gene across these samples:
+
+``` r
+control <- metadata[metadata[,"dex"]=="control",]
+control.mean <- rowSums( counts[ ,control$id] )/4 
+names(control.mean) <- counts$ensgene
+```
+
+# Q1
+
+> How would you make the above code more robust? What would happen if
+> you were to add more samples. Would the values obtained with the excat
+> code above be correct?
+
+Rather than use a specific formula, **rowSums(counts\[
+,control$id\])/4**, use a function that calculates the mean (i.e.
+**rowMeans( counts\[ ,control$id\] )** ).
+
+# Q2
+
+> Follow the same procedure for the treated samples (i.e. calculate the
+> mean per gene accross drug treated samples and assign to a labeled
+> vector called treated.mean)
+
+``` r
+treated <- metadata[metadata[,"dex"]=="treated",]
+treated.mean <- rowMeans( counts[ ,treated$id] )
+names(treated.mean) <- counts$ensgene
+```
+
+> Combine meancount data
+
+``` r
+meancounts <- data.frame(control.mean, treated.mean)
+
+# show the sum of the mean counts across all genes for each group
+colSums(meancounts)
+```
+
+    ## control.mean treated.mean 
+    ##     23005324     22196524
+
+# Q3
+
+> Create a scatter plot showing the mean of the treated samples against
+> the mean of the control
+samples.
+
+``` r
+plot(meancounts, xlab = "Control", ylab = "Treated") # on a linear scale
+```
+
+![](class14_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+plot(meancounts, log = "xy", xlab = "log Control", ylab = "log Treated") # on a log scale
+```
+
+    ## Warning in xy.coords(x, y, xlabel, ylabel, log): 15032 x values <= 0
+    ## omitted from logarithmic plot
+
+    ## Warning in xy.coords(x, y, xlabel, ylabel, log): 15281 y values <= 0
+    ## omitted from logarithmic plot
+
+![](class14_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
